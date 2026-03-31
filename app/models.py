@@ -35,3 +35,23 @@ class SummarizeResponse(BaseModel):
     bullet_summary: List[str]
     keywords: List[str]
     confidence_note: str
+
+class CritiqueResult(BaseModel):
+    score: float
+    completeness: str
+    hallucination_risk: str
+    missing_details: str
+    length_feedback: str
+    overall_feedback: str
+
+class IterationLog(BaseModel):
+    iteration: int
+    draft: SummarizeResponse
+    critique: CritiqueResult
+
+class AgentResponse(BaseModel):
+    final_summary: SummarizeResponse
+    iterations_run: int
+    final_score: float
+    stopped_early: bool
+    logs: List[IterationLog]
