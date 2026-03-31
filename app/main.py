@@ -20,7 +20,7 @@ def health():
 
 @app.post("/summarize", response_model=SummarizeResponse)
 def summarize_endpoint(request: SummarizeRequest):
-    if not request.text.strip():
+    if not request.text and not request.patient_data:
         raise HTTPException(status_code=422, detail="Text field cannot be empty")
     try:
         return summarize(request)
