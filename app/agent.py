@@ -8,16 +8,25 @@ from app.llm_service import call_llm
 logger = logging.getLogger(__name__)
 
 QUALITY_THRESHOLD = 9.0
-MAX_ITERATIONS = 3
+MAX_ITERATIONS = 5
 
 def build_revision_prompt(original_text: str, current_summary: SummarizeResponse, critique) -> str:
     return f"""
-You are a medical summarization assistant. Revise the following summary based on the critique provided.
+You are a medical summarization assistant. You MUST include ALL of the following fields in your revised summary:
+- Diagnosis
+- All symptoms
+- All medications with dosages
+- All surgeries and their status
+- All allergies
+- All medical warnings
+- All problems
+- All vitals (BP, HR, RR, Temp, SpO2)
+- All lab results with values
 
 Original patient data:
 \"\"\"{original_text}\"\"\"
 
-Current summary:
+Current summary that needs improvement:
 - Short summary: {current_summary.short_summary}
 - Bullet points: {current_summary.bullet_summary}
 - Keywords: {current_summary.keywords}
@@ -25,17 +34,15 @@ Current summary:
 
 Critique feedback:
 - Completeness: {critique.completeness}
-- Hallucination risk: {critique.hallucination_risk}
 - Missing details: {critique.missing_details}
-- Length feedback: {critique.length_feedback}
 - Overall: {critique.overall_feedback}
 
-Return ONLY a valid JSON object with exactly these fields:
+Return ONLY a valid JSON object:
 {{
-  "short_summary": "revised concise summary",
-  "bullet_summary": ["revised point 1", "revised point 2", "revised point 3"],
+  "short_summary": "comprehensive summary including ALL medical fields listed above",
+  "bullet_summary": ["point covering diagnosis and vitals", "point covering medications and allergies", "point covering surgeries and warnings and lab results"],
   "keywords": ["keyword1", "keyword2", "keyword3"],
-  "confidence_note": "updated confidence note"
+  "confidence_note": "confidence note"
 }}
 
 No markdown, no explanation, only JSON.

@@ -7,12 +7,16 @@ logger = logging.getLogger(__name__)
 
 def build_critique_prompt(summary: SummarizeResponse, original_text: str) -> str:
     return f"""
-You are a medical summary reviewer. Evaluate the following summary against the original patient data.
+You are a strict medical summary reviewer. Evaluate the following summary against the original patient data.
+
+Scoring guide:
+- 9-10: All critical fields present (diagnosis, medications, vitals, lab results, allergies, warnings, surgeries). Well written and accurate.
+- 7-8: Most fields present but 1-2 minor details missing.
+- 5-6: Several important fields missing.
+- Below 5: Major information missing or inaccurate.
 
 Original patient data:
-\"\"\"
-{original_text}
-\"\"\"
+\"\"\"{original_text}\"\"\"
 
 Summary to evaluate:
 - Short summary: {summary.short_summary}
@@ -30,7 +34,7 @@ Return ONLY a JSON object with exactly these fields:
   "overall_feedback": "one sentence on what needs to improve most"
 }}
 
-Be strict. This is medical data. Return ONLY valid JSON, no markdown, no explanation.
+Return ONLY valid JSON, no markdown, no explanation.
 """.strip()
 
 def critique_summary(summary: SummarizeResponse, original_text: str) -> CritiqueResult:
